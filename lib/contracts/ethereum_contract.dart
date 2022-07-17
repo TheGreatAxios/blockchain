@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 
 import 'abi/abi.dart';
 
@@ -7,7 +7,7 @@ import 'abi/abi.dart';
 ///
 /// A future version of this library will automatically generate subclasses of
 /// this based on the abi given, making it easier to call methods in contracts.
-class DeployedContract {
+class EthereumContract {
   /// The lower-level ABI of this contract used to encode data to send in
   /// transactions when calling this contract.
   final ContractAbi abi;
@@ -15,7 +15,10 @@ class DeployedContract {
   /// The Ethereum address at which this contract is reachable.
   final String address;
 
-  DeployedContract(this.abi, this.address);
+  EthereumContract({
+    required this.address,
+    required this.abi
+  });
 
   /// Get a list of all functions defined by the contract ABI.
   List<ContractFunction> get functions => abi.functions;
@@ -40,7 +43,6 @@ class DeployedContract {
       final ContractFunction function = functions.firstWhere((f) => f.name == name);
       return function;
     } catch (err, trace) {
-      debugPrint("Debug: $err\n$trace");
       rethrow;
     }
   }

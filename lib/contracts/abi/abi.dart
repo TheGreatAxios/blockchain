@@ -268,7 +268,6 @@ class ContractFunction {
   /// [outputs] are. For the conversions between dart types and solidity types,
   /// see the documentation for [encodeCall].
   List<dynamic> decodeReturnValues(String data) {
-    // print("Data: $data");
     final tuple = TupleType(outputs.map((p) => p.type).toList());
     final buffer = Formatter.hexToBytes(data).buffer;
 
@@ -338,7 +337,6 @@ class ContractEvent {
           topicIndex++;
           continue;
         }
-        print("Topic Index: $topicIndex");
         final topicBuffer = Formatter.hexToBytes(topics[topicIndex]).buffer;
         result.add(component.parameter.type.decode(topicBuffer, 0).data);
 

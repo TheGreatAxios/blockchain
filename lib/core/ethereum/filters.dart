@@ -67,15 +67,15 @@ class _PendingTransactionsFilter extends _Filter<String> {
 class FilterOptions {
   FilterOptions({this.fromBlock, this.toBlock, this.address, this.topics});
 
-  // FilterOptions.events(
-  //     {required DeployedContract contract,
-  //       required ContractEvent event,
-  //       this.fromBlock,
-  //       this.toBlock})
-  //     : address = contract.address,
-  //       topics = [
-  //         [bytesToHex(event.signature, padToEvenLength: true, include0x: true)]
-  //       ];
+  FilterOptions.events(
+      {required EthereumContract contract,
+        required ContractEvent event,
+        this.fromBlock,
+        this.toBlock})
+      : address = contract.address,
+        topics = [
+          [Formatter.bytesToHex(event.signature, padToEvenLength: true, include0x: true)]
+        ];
 
   /// The earliest block which should be considered for this filter. Optional,
   /// the default value is [BlockNum.current].
@@ -271,7 +271,6 @@ class _EventFilter extends _Filter<FilterEvent> {
 
   @override
   FilterEvent parseChanges(log) {
-    // print("LOG INDEX: ${log["logIndex"]}");
     return FilterEvent.fromMap(log as Map<String, dynamic>);
   }
 }
@@ -389,8 +388,6 @@ class _FilterEngine {
   }
 
   void _parseAndAdd(_InstantiatedFilter filter, dynamic payload) {
-    // print("Filter: ${filter.toString()}");
-    // print("Payload: ${payload.toString()}");
     final parsed = filter.filter.parseChanges(payload);
     filter._controller.add(parsed);
   }

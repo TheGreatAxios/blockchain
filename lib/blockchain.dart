@@ -18,6 +18,7 @@ import 'package:blockchain/crypto/msg_signature.dart';
 import 'package:blockchain/utils/rlp.dart' as rlp;
 import 'package:stream_transform/stream_transform.dart';
 
+export 'libraries/contracts.dart';
 export 'libraries/credentials.dart';
 export 'libraries/crypto.dart';
 export 'utils/utils.dart';

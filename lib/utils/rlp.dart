@@ -37,7 +37,6 @@ void encodeList(List list, LengthTrackingByteSink builder) {
   for (final item in list) {
     _encodeToBuffer(item, subBuilder);
   }
-
   final length = subBuilder.length;
   if (length <= 55) {
     builder
@@ -82,6 +81,5 @@ void _encodeToBuffer(dynamic value, LengthTrackingByteSink builder) {
 List<int> encode(dynamic value) {
   final builder = LengthTrackingByteSink();
   _encodeToBuffer(value, builder);
-
   return builder.asBytes();
 }

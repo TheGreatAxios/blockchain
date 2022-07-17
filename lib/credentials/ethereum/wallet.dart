@@ -98,8 +98,9 @@ class _ScryptKeyDerivator extends _KeyDerivator {
 @immutable
 class Wallet {
   /// The credentials stored in this wallet file
-  final EthPrivateKey privateKey;
-
+  final String privateKey; // EthPrivateKey
+  /// The Type of the Native Ipmlementation
+  final String type;
   /// The key derivator used to obtain the aes decryption key from the password
   final _KeyDerivator _derivator;
 
@@ -109,7 +110,7 @@ class Wallet {
   final Uint8List _id;
 
   const Wallet._(
-      this.privateKey, this._derivator, this._password, this._iv, this._id);
+      this.privateKey, this._derivator, this._password, this._iv, this._id, this.type);
 
   /// Gets the random uuid assigned to this wallet file
   String get uuid => UUID.formatUuid(_id);
@@ -130,6 +131,7 @@ class Wallet {
       },
       'id': uuid,
       'version': 3,
+      "type": type
     };
 
     return json.encode(map);
@@ -142,9 +144,10 @@ class Wallet {
   /// The default value for [scryptN] is 8192. Be aware that this N must be a
   /// power of two.
   factory Wallet.createNew(
-    EthPrivateKey credentials,
+    String credentials,
     String password,
     Random random,
+    String type,
     {
         int scryptN = 8192,
         int p = 1
@@ -159,7 +162,7 @@ class Wallet {
 
     final Uint8List iv = dartRandom.nextBytes(128 ~/ 8);
 
-    return Wallet._(credentials, derivator, passwordBytes, iv, uuid);
+    return Wallet._(credentials, derivator, passwordBytes, iv, uuid, type);
   }
 
   /// Reads and unlocks the wallet denoted in the json string given with the
@@ -250,11 +253,11 @@ class Wallet {
     final aes = _initCipher(false, aesKey, iv);
 
     final privateKey = aes.process(Uint8List.fromList(encryptedPrivateKey));
-    final credentials = EthPrivateKey(privateKey);
+    final credentials = _getPrivateKeyString(privateKey); // EthPrivateKey(privateKey);
 
     final id = UUID.parseUuid(data['id'] as String);
 
-    return Wallet._(credentials, derivator, encodedPassword, iv, id);
+    return Wallet._(credentials, derivator, encodedPassword, iv, id, data['type']);
   }
 
   static String _generateMac(List<int> dk, List<int> ciphertext) {
@@ -274,6 +277,14 @@ class Wallet {
     final aesKey = Uint8List.view(derived.buffer, 0, 16);
 
     final aes = _initCipher(true, aesKey, _iv);
-    return aes.process(privateKey.privateKey);
+    return aes.process(_getNativePrivateKeyAsBytes(privateKey)); // return aes.process(privateKey.privateKey);
+  }
+
+  Uint8List _getNativePrivateKeyAsBytes(String key) {
+    return EthPrivateKey.fromHex(key).privateKey;
+  }
+
+  static String _getPrivateKeyString(Uint8List key) {
+    return Formatter.bytesToHex(key);
   }
 }

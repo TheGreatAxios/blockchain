@@ -17,11 +17,11 @@ class TransactionRequest {
   /// reasonable spending via [Web3Client.estimateGas].
   ///
   /// Gas that is not used but included in [maxGas] will be returned.
-  final BigInt? maxGas;
+  dynamic? maxGas;
 
   /// How much ether to spend on a single unit of gas. Can be null, in which
   /// case the rpc server will choose this value.
-  final EthereumAmount? gasPrice;
+  dynamic? gasPrice;
 
   /// How much ether to send to [to]. This can be null, as some transactions
   /// that call a contracts method won't have to send ether.
@@ -57,8 +57,8 @@ class TransactionRequest {
   TransactionRequest copyWith(
       {String? from,
         String? to,
-        dynamic? maxGas,
-        dynamic? gasPrice,
+        dynamic maxGas,
+        dynamic gasPrice,
         EthereumAmount? value,
         Uint8List? data,
         int? nonce,

@@ -35,13 +35,13 @@ class JsonRPC extends RpcService {
   @override
   Future<RPCResponse> call(String function, [List<dynamic>? params]) async {
     params ??= [];
-
     final requestPayload = {
       'jsonrpc': '2.0',
       'method': function,
       'params': params,
       'id': _currentRequestId++,
     };
+
     final response = await client.post(
       Uri.parse(url),
       headers: {'Content-Type': 'application/json'},
@@ -49,7 +49,7 @@ class JsonRPC extends RpcService {
     );
 
     final data = json.decode(response.body) as Map<String, dynamic>;
-    // print("Data: $data");
+
     final id = data['id'];
     if (data.containsKey('error')) {
       final error = data['error'];
@@ -59,7 +59,6 @@ class JsonRPC extends RpcService {
       final dynamic code = error['code'];
       final dynamic message = error['message'];
       final dynamic errorData = error['data'];
-      // print(error);
       throw RPCError(code, message, errorData);
     }
 

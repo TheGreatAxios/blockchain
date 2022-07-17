@@ -51,22 +51,13 @@ class EthereumClient {
 
   Future<T> _makeRPCCall<T>(String function, [List<dynamic>? params]) async {
     try {
-      // print(function);
-      // print(params);
-      // params?.forEach((element) => print(element.toString()));
       final data = await _jsonRpc.call(function, params);
 
       if (data is Error || data is Exception) {
-        // print("Error Result");
-        // print(data.result);
         throw data;
       }
-      // print(data.result.runtimeType);
       return data.result as T;
-
-      // ignore: avoid_catches_without_on_clauses
     } catch (e) {
-      // print("Print Errors");
       if (printErrors) print(e);
 
       rethrow;
@@ -182,7 +173,6 @@ class EthereumClient {
   /// amount to use.
   Future<EthereumAmount> getGasPrice() async {
     final data = await _makeRPCCall<String>('eth_gasPrice');
-    // print("Data on Gas: ${data}");
     return EthereumAmount.fromUnitAndValue(EthereumUnit.wei, Formatter.hexToInt(data));
   }
 
@@ -346,21 +336,21 @@ class EthereumClient {
   // ///
   // /// This function allows specifying a custom block mined in the past to get
   // /// historical data. By default, [BlockNumber.current] will be used.
-  // Future<List<dynamic>> call({
-  //   String? sender,
-  //   required DeployedContract contract,
-  //   required ContractFunction function,
-  //   required List<dynamic> params,
-  //   BlockNumber? atBlock,
-  // }) async {
-  //   final encodedResult = await callRaw(
-  //     sender: sender,
-  //     contract: contract.address,
-  //     data: function.encodeCall(params),
-  //     atBlock: atBlock,
-  //   );
-  //   return function.decodeReturnValues(encodedResult);
-  // }
+  Future<List<dynamic>> call({
+    String? sender,
+    required EthereumContract contract,
+    required ContractFunction function,
+    required List<dynamic> params,
+    BlockNumber? atBlock,
+  }) async {
+    final encodedResult = await callRaw(
+      sender: sender,
+      contract: contract.address,
+      data: function.encodeCall(params),
+      atBlock: atBlock,
+    );
+    return function.decodeReturnValues(encodedResult);
+  }
 
   /// Estimate the amount of gas that would be necessary if the transaction was
   /// sent via [sendTransaction]. Note that the estimate may be significantly
@@ -369,8 +359,8 @@ class EthereumClient {
     String? sender,
     String? to,
     EthereumAmount? value,
-    BigInt? amountOfGas,
-    EthereumAmount? gasPrice,
+    dynamic? amountOfGas,
+    dynamic? gasPrice,
     EthereumAmount? maxPriorityFeePerGas,
     EthereumAmount? maxFeePerGas,
     Uint8List? data,
@@ -385,7 +375,7 @@ class EthereumClient {
             if (to != null) 'to': to,
             if (amountOfGas != null) 'gas': '0x${amountOfGas.toRadixString(16)}',
             if (gasPrice != null)
-              'gasPrice': '0x${gasPrice.getInWei.toRadixString(16)}',
+              'gasPrice': gasPrice.runtimeType.toString() == '_BigIntImpl' ? '0x${gasPrice.toRadixString(16)}' : gasPrice.runtimeType.toString() == 'String' ? '0x:${gasPrice}' : '0x${(gasPrice as EthereumAmount).getInWei.toRadixString(16)}',
             if (maxPriorityFeePerGas != null)
               'maxPriorityFeePerGas':
               '0x${maxPriorityFeePerGas.getInWei.toRadixString(16)}',
@@ -398,7 +388,6 @@ class EthereumClient {
       );
       return Formatter.hexToInt(amountHex);
     } catch (err, trace) {
-      print("ERROR: $err \n $trace");
       rethrow;
     }
   }
