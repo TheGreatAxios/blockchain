@@ -7,6 +7,7 @@ import 'package:blockchain/core/ethereum/amount.dart';
 import 'package:blockchain/core/ethereum/block_number.dart';
 import 'package:blockchain/constant/ethereum_unit.dart';
 import 'package:blockchain/core/ethereum/block.dart';
+import 'package:blockchain/core/ethereum/fee_data.dart';
 import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:blockchain/core/ethereum/json_rpc.dart';
