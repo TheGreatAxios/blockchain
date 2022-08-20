@@ -176,8 +176,36 @@ class EthereumClient {
     return EthereumAmount.fromUnitAndValue(EthereumUnit.wei, Formatter.hexToInt(data));
   }
 
+
+  /// Gets Fee Data
+  /// Automatically Returns Proper Information if EIP-1159 Compatible
+  Future<FeeData> getFeeData() async {
+    final Block block = await getBlock();
+    final EthereumAmount gasPrice = await getGasPrice();
+    bool isEip1159Support = false;
+
+    late final BigInt? lastBaseFeePerGas;
+    late final BigInt? maxPriorityFeePerGas;
+    late final BigInt? maxFeePerGas;
+
+    if (block.isSupportEIP1559 && block.baseFeePerGas != null) {
+      isEip1159Support = true;
+      lastBaseFeePerGas = block.baseFeePerGas!.getValueInUnitBI(EthereumUnit.wei);
+      maxPriorityFeePerGas = BigInt.from(1500000000);
+      maxFeePerGas = (block.baseFeePerGas!.getValueInUnitBI(EthereumUnit.wei) * BigInt.from(2)) + maxPriorityFeePerGas;
+    }
+
+    return FeeData(
+        gasPrice: gasPrice,
+        isEip1159: isEip1159Support,
+        lastBaseFeePerGas: lastBaseFeePerGas,
+        maxPriorityFeePerGas: maxPriorityFeePerGas,
+        maxFeePerGas: maxFeePerGas
+    );
+  }
+
   /// Returns the number of the most recent block on the chain.
-  Future<int> getBlockNumberber() {
+  Future<int> getBlockNumber() {
     return _makeRPCCall<String>('eth_blockNumber')
         .then((s) => Formatter.hexToInt(s).toInt());
   }
